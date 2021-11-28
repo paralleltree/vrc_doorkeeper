@@ -38,10 +38,10 @@ jobs:
         if: matrix.platform == 'windows'
         shell: pwsh
         run: |
-          mkdir vrc_doorkeeper
-          mv target/release/*.exe vrc_doorkeeper/
-          Compress-Archive -Path vrc_doorkeeper/ -DestinationPath vrc_doorkeeper-${{ matrix.platform }}.zip
-          ls
+          mkdir artifacts\vrc_doorkeeper
+          mv target\release\*.exe artifacts\vrc_doorkeeper
+          Compress-Archive -Path artifacts\vrc_doorkeeper -DestinationPath vrc_doorkeeper-${{ matrix.platform }}.zip
+          ls target
           ls vrc_doorkeeper
 
       - uses: actions/upload-artifact@v2
