@@ -41,6 +41,8 @@ jobs:
           mkdir vrc_doorkeeper
           mv target/release/*.exe vrc_doorkeeper/
           Compress-Archive -Path vrc_doorkeeper/ -DestinationPath vrc_doorkeeper-${{ matrix.platform }}.zip
+          ls
+          ls vrc_doorkeeper
 
       - uses: actions/upload-artifact@v2
         with:
