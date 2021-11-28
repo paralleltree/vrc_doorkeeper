@@ -1,3 +1,4 @@
+mod vrc;
 mod xsoverlay;
 
 fn main() {
