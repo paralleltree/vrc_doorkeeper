@@ -46,7 +46,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: build-${{ matrix.platform }}
-          path: vrc_doorkeeper-${{ matrix.platform }}.zip
+          path: artifacts\vrc_doorkeeper-${{ matrix.platform }}.zip
 
   create-release:
     needs: build
