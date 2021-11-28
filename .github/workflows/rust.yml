@@ -47,7 +47,7 @@ jobs:
           path: vrc_doorkeeper-${{ matrix.platform }}.zip
 
   create-release:
-    needs: test
+    needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
