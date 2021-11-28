@@ -39,7 +39,7 @@ jobs:
         run: |
           powershell mkdir vrc_doorkeeper
           powershell mv target/release/*.exe vrc_doorkeeper/
-          powershell Compress-Archive -Path vrc_doorkeeper/ -DestinationPath vrc_doorkeeper.zip
+          powershell Compress-Archive -Path vrc_doorkeeper/ -DestinationPath vrc_doorkeeper-${{ matrix.platform }}.zip
 
       - uses: actions/upload-artifact@v2
         with:
