@@ -36,10 +36,11 @@ jobs:
 
       - name: Pack for Windows
         if: matrix.platform == 'windows'
+        shell: pwsh
         run: |
-          powershell mkdir vrc_doorkeeper
-          powershell mv target/release/*.exe vrc_doorkeeper/
-          powershell Compress-Archive -Path vrc_doorkeeper/ -DestinationPath vrc_doorkeeper-${{ matrix.platform }}.zip
+          mkdir vrc_doorkeeper
+          mv target/release/*.exe vrc_doorkeeper/
+          Compress-Archive -Path vrc_doorkeeper/ -DestinationPath vrc_doorkeeper-${{ matrix.platform }}.zip
 
       - uses: actions/upload-artifact@v2
         with:
