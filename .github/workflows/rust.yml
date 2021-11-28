@@ -29,16 +29,16 @@ jobs:
           target: ${{ matrix.target }}
 
       - name: Build
-        run: cargo build --release --target=${{ matrix.target }} --verbose
+        run: cargo build --release --target=${{ matrix.target }}
 
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo test
 
       - name: Pack for Windows
         if: matrix.platform == 'windows'
         run: |
           powershell mkdir vrc_doorkeeper
-          powershell mv target/${{ matrix.target }}/release/*.exe vrc_doorkeeper/
+          powershell mv target/release/*.exe vrc_doorkeeper/
           powershell Compress-Archive -Path vrc_doorkeeper/ -DestinationPath vrc_doorkeeper.zip
 
       - uses: actions/upload-artifact@v2
