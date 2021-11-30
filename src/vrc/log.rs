@@ -4,7 +4,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use chrono::prelude::NaiveDateTime;
+use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -19,8 +19,10 @@ lazy_static! {
     .unwrap();
     static ref USER_AUTHENTICATED_PATTERN: Regex =
         Regex::new(r"User Authenticated: (?P<username>.+)").unwrap();
+    static ref ON_JOINED_ROOM_PATTERN: Regex = Regex::new("OnJoinedRoom").unwrap();
     static ref ON_PLAYER_JOINED_PATTERN: Regex =
         Regex::new(r"OnPlayerJoined (?P<username>.+)").unwrap();
+    static ref ON_LEFT_ROOM_PATTERN: Regex = Regex::new("OnLeftRoom").unwrap();
     static ref ON_PLAYER_LEFT_PATTERN: Regex =
         Regex::new(r"OnPlayerLeft (?P<username>.+)").unwrap();
 }
@@ -65,7 +67,7 @@ pub enum LogLevel {
 
 #[derive(Debug, PartialEq)]
 pub struct LogLine {
-    pub time: NaiveDateTime,
+    pub time: DateTime<Local>,
     pub log_level: LogLevel,
     pub event: Option<Event>,
     pub body: String,
@@ -75,10 +77,8 @@ impl LogLine {
     pub fn from_line(line: &str) -> Option<LogLine> {
         let cap = LOG_HEADER_PATTERN.captures(line)?;
         let timestamp = cap.name("timestamp").unwrap().as_str();
-        let timestamp = match NaiveDateTime::parse_from_str(timestamp, "%Y.%m.%d %H:%M:%S") {
-            Ok(t) => t,
-            Err(_) => return None,
-        };
+        let timestamp = NaiveDateTime::parse_from_str(timestamp, "%Y.%m.%d %H:%M:%S").ok()?;
+        let local_timestamp = Local.from_local_datetime(&timestamp).earliest()?;
         let level = match cap.name("level").unwrap().as_str() {
             "Log" => LogLevel::Log,
             "Warning" => LogLevel::Warning,
@@ -88,7 +88,7 @@ impl LogLine {
         let body = cap.name("body").unwrap().as_str();
         let event = Self::parse_body(body);
         Some(LogLine {
-            time: timestamp,
+            time: local_timestamp,
             log_level: level,
             body: body.to_owned(),
             event: event,
@@ -96,10 +96,18 @@ impl LogLine {
     }
 
     fn parse_body(body: &str) -> Option<Event> {
+        if ON_JOINED_ROOM_PATTERN.is_match(body) {
+            return Some(Event::OnJoinedRoom);
+        }
+
         if let Some(cap) = ON_PLAYER_JOINED_PATTERN.captures(body) {
             return Some(Event::OnPlayerJoined {
                 user_name: cap.name("username").unwrap().as_str().to_owned(),
             });
+        }
+
+        if ON_LEFT_ROOM_PATTERN.is_match(body) {
+            return Some(Event::OnLeftRoom);
         }
 
         if let Some(cap) = ON_PLAYER_LEFT_PATTERN.captures(body) {
