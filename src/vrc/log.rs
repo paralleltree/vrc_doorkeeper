@@ -18,13 +18,13 @@ lazy_static! {
     )
     .unwrap();
     static ref USER_AUTHENTICATED_PATTERN: Regex =
-        Regex::new(r"User Authenticated: (?P<username>.+)").unwrap();
-    static ref ON_JOINED_ROOM_PATTERN: Regex = Regex::new("OnJoinedRoom").unwrap();
+        Regex::new(r"\[Behaviour\] User Authenticated: (?P<username>.+)").unwrap();
+    static ref ON_JOINED_ROOM_PATTERN: Regex = Regex::new(r"\[Behaviour\] OnJoinedRoom").unwrap();
     static ref ON_PLAYER_JOINED_PATTERN: Regex =
-        Regex::new(r"OnPlayerJoined (?P<username>.+)").unwrap();
-    static ref ON_LEFT_ROOM_PATTERN: Regex = Regex::new("OnLeftRoom").unwrap();
+        Regex::new(r"\[Behaviour\] OnPlayerJoined (?P<username>.+)").unwrap();
+    static ref ON_LEFT_ROOM_PATTERN: Regex = Regex::new(r"\[Behaviour\] OnLeftRoom").unwrap();
     static ref ON_PLAYER_LEFT_PATTERN: Regex =
-        Regex::new(r"OnPlayerLeft (?P<username>.+)").unwrap();
+        Regex::new(r"\[Behaviour\] OnPlayerLeft (?P<username>.+)").unwrap();
 }
 
 #[cfg(target_os = "windows")]
