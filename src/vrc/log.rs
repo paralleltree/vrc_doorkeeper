@@ -125,3 +125,84 @@ impl LogLine {
         None
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::{DateTime, NaiveDate};
+
+    fn local_time(time: &NaiveDateTime) -> DateTime<Local> {
+        Local.from_local_datetime(&time).latest().unwrap()
+    }
+
+    #[test]
+    fn log_line_can_parse_on_joined_room_event() {
+        let line = "2021.12.01 23:23:12 Log        -  [Behaviour] OnJoinedRoom";
+        let actual = LogLine::from_line(line).expect("could not parse log line.");
+        let expected = LogLine {
+            time: local_time(&NaiveDate::from_ymd(2021, 12, 1).and_hms(23, 23, 12)),
+            log_level: LogLevel::Log,
+            event: Some(crate::vrc::Event::OnJoinedRoom),
+            body: "[Behaviour] OnJoinedRoom".to_owned(),
+        };
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn log_line_can_parse_on_player_joined_event() {
+        let line = "2021.12.01 23:23:13 Log        -  [Behaviour] OnPlayerJoined paralleltree";
+        let actual = LogLine::from_line(line).expect("could not parse log line.");
+        let expected = LogLine {
+            time: local_time(&NaiveDate::from_ymd(2021, 12, 1).and_hms(23, 23, 13)),
+            log_level: LogLevel::Log,
+            event: Some(crate::vrc::Event::OnPlayerJoined {
+                user_name: "paralleltree".to_owned(),
+            }),
+            body: "[Behaviour] OnPlayerJoined paralleltree".to_owned(),
+        };
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn log_line_can_parse_on_left_room_event() {
+        let line = "2021.12.01 23:26:39 Log        -  [Behaviour] OnLeftRoom";
+        let actual = LogLine::from_line(line).expect("could not parse log line.");
+        let expected = LogLine {
+            time: local_time(&NaiveDate::from_ymd(2021, 12, 1).and_hms(23, 26, 39)),
+            log_level: LogLevel::Log,
+            event: Some(crate::vrc::Event::OnLeftRoom),
+            body: "[Behaviour] OnLeftRoom".to_owned(),
+        };
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn log_line_can_parse_on_player_left_event() {
+        let line = "2021.12.01 23:26:39 Log        -  [Behaviour] OnPlayerLeft paralleltree";
+        let actual = LogLine::from_line(line).expect("could not parse log line.");
+        let expected = LogLine {
+            time: local_time(&NaiveDate::from_ymd(2021, 12, 1).and_hms(23, 26, 39)),
+            log_level: LogLevel::Log,
+            event: Some(crate::vrc::Event::OnPlayerLeft {
+                user_name: "paralleltree".to_owned(),
+            }),
+            body: "[Behaviour] OnPlayerLeft paralleltree".to_owned(),
+        };
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn log_line_can_parse_user_authenticated_event() {
+        let line = "2021.11.03 23:41:04 Log        -  [Behaviour] User Authenticated: paralleltree";
+        let actual = LogLine::from_line(line).expect("could not parse log line.");
+        let expected = LogLine {
+            time: local_time(&NaiveDate::from_ymd(2021, 11, 3).and_hms(23, 41, 4)),
+            log_level: LogLevel::Log,
+            event: Some(crate::vrc::Event::UserAuthenticated {
+                user_name: "paralleltree".to_owned(),
+            }),
+            body: "[Behaviour] User Authenticated: paralleltree".to_owned(),
+        };
+        assert_eq!(expected, actual);
+    }
+}
