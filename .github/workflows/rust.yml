@@ -1,0 +1,101 @@
+name: Rust
+
+on: [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    strategy:
+      matrix:
+        platform:
+          - windows
+        include:
+          - platform: windows
+            target: x86_64-pc-windows-msvc
+            os: windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --target=${{ matrix.target }}
+
+      - name: Run tests
+        run: cargo test
+
+      - name: Pack for Windows
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          mkdir artifacts\vrc_doorkeeper
+          mv target\${{ matrix.target }}\release\*.exe artifacts\vrc_doorkeeper
+          cp README.md artifacts\vrc_doorkeeper\README.txt
+          Compress-Archive -Path artifacts\vrc_doorkeeper -DestinationPath artifacts\vrc_doorkeeper-${{ matrix.platform }}.zip
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build-${{ matrix.platform }}
+          path: artifacts\vrc_doorkeeper-${{ matrix.platform }}.zip
+
+  create-release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+      - run: |
+          echo '${{ steps.create-release.outputs.upload_url }}' > assets_upload_url
+      - uses: actions/upload-artifact@v1
+        with:
+          name: create-release
+          path: assets_upload_url
+
+  publish:
+    needs: create-release
+
+    strategy:
+      matrix:
+        platform:
+          - windows
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v1
+        with:
+          name: create-release
+
+      - id: upload-url
+        run: |
+          echo "::set-output name=url::$(cat create-release/assets_upload_url)"
+
+      - uses: actions/download-artifact@v1
+        with:
+          name: build-${{ matrix.platform }}
+
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.upload-url.outputs.url }}
+          asset_path: ./build-${{ matrix.platform }}/vrc_doorkeeper-${{ matrix.platform }}.zip
+          asset_name: vrc_doorkeeper-${{ matrix.platform }}.zip
+          asset_content_type: application/zip
