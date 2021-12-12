@@ -40,6 +40,7 @@ jobs:
         run: |
           mkdir artifacts\vrc_doorkeeper
           mv target\${{ matrix.target }}\release\*.exe artifacts\vrc_doorkeeper
+          cp README.md artifacts\vrc_doorkeeper\README.txt
           Compress-Archive -Path artifacts\vrc_doorkeeper -DestinationPath artifacts\vrc_doorkeeper-${{ matrix.platform }}.zip
 
       - uses: actions/upload-artifact@v2
