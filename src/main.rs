@@ -102,8 +102,8 @@ impl<C: CurrentTimeProvider> LogLineProcessor for VrcToXsOverlayNotifier<C> {
 
 fn main() {
     let client = NotificationClient::new().expect("Failed to initialize NotificationClient.");
-    let welcome = MessageObjectBuilder::new("VRC Dooker".to_owned())
-        .set_content("Join and Leave notification are enabled.".to_owned())
+    let welcome = MessageObjectBuilder::new("VRC Doorkeeper".to_owned())
+        .set_content("Join and Leave notifications are enabled.".to_owned())
         .set_timeout(2f32)
         .build();
     client
