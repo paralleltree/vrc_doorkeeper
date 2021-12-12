@@ -1,3 +1,4 @@
+mod assets;
 mod reader;
 mod vrc;
 mod xsoverlay;
@@ -37,17 +38,23 @@ impl<C: CurrentTimeProvider> VrcToXsOverlayNotifier<C> {
             }
         }
 
-        let title = match line.event? {
-            vrc::Event::OnPlayerJoined { user_name } => {
-                format!("{} joined.", user_name)
-            }
-            vrc::Event::OnPlayerLeft { user_name } => {
-                format!("{} left.", user_name)
-            }
+        let (title, icon) = match line.event? {
+            vrc::Event::OnPlayerJoined { user_name } => (
+                format!("{} joined.", user_name),
+                &*assets::ON_PLAYER_JOINED_ROOM_ICON,
+            ),
+            vrc::Event::OnPlayerLeft { user_name } => (
+                format!("{} left.", user_name),
+                &*assets::ON_PLAYER_LEFT_ROOM_ICON,
+            ),
             _ => return None,
         };
 
-        Some(MessageObjectBuilder::new(title).set_timeout(1f32).build())
+        let message = MessageObjectBuilder::new(title)
+            .set_icon(xsoverlay::NotificationType::Custom(String::from(icon)), true)
+            .set_timeout(1f32)
+            .build();
+        Some(message)
     }
 }
 
