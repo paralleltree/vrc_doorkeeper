@@ -11,8 +11,7 @@ use regex::Regex;
 use super::Event;
 
 lazy_static! {
-    pub static ref LOG_FILE_NAME_PATTERN: Regex =
-        Regex::new(r"^output_log_\d{2}-\d{2}-\d{2}\.txt$").unwrap();
+    pub static ref LOG_FILE_NAME_PATTERN: Regex = Regex::new(r"^output_log_.*\.txt$").unwrap();
     static ref LOG_HEADER_PATTERN: Regex = Regex::new(
         r"(?P<timestamp>\d{4}.\d{2}.\d{2} \d{2}:\d{2}:\d{2}) (?P<level>[^ ]+) *-  (?P<body>.*)"
     )
