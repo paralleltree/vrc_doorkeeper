@@ -137,13 +137,13 @@ mod tests {
 
     #[test]
     fn log_line_can_parse_on_joined_room_event() {
-        let line = "2021.12.01 23:23:12 Log        -  [Behaviour] OnJoinedRoom";
+        let line = "2021.12.01 23:23:12 Log        -  [Behaviour] Finished entering world.";
         let actual = LogLine::from_line(line).expect("could not parse log line.");
         let expected = LogLine {
             time: local_time(&NaiveDate::from_ymd(2021, 12, 1).and_hms(23, 23, 12)),
             log_level: LogLevel::Log,
             event: Some(crate::vrc::Event::OnJoinedRoom),
-            body: "[Behaviour] OnJoinedRoom".to_owned(),
+            body: "[Behaviour] Finished entering world.".to_owned(),
         };
         assert_eq!(expected, actual);
     }
@@ -193,7 +193,7 @@ mod tests {
 
     #[test]
     fn log_line_can_parse_user_authenticated_event() {
-        let line = "2021.11.03 23:41:04 Log        -  [Behaviour] User Authenticated: paralleltree";
+        let line = "2021.11.03 23:41:04 Log        -  [Behaviour] User Authenticated: paralleltree (usr_deadbeef-dead-beef-beef-deadbeefbeef)";
         let actual = LogLine::from_line(line).expect("could not parse log line.");
         let expected = LogLine {
             time: local_time(&NaiveDate::from_ymd(2021, 11, 3).and_hms(23, 41, 4)),
@@ -201,7 +201,7 @@ mod tests {
             event: Some(crate::vrc::Event::UserAuthenticated {
                 user_name: "paralleltree".to_owned(),
             }),
-            body: "[Behaviour] User Authenticated: paralleltree".to_owned(),
+            body: "[Behaviour] User Authenticated: paralleltree (usr_deadbeef-dead-beef-beef-deadbeefbeef)".to_owned(),
         };
         assert_eq!(expected, actual);
     }
