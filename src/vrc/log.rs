@@ -17,8 +17,9 @@ lazy_static! {
     )
     .unwrap();
     static ref USER_AUTHENTICATED_PATTERN: Regex =
-        Regex::new(r"\[Behaviour\] User Authenticated: (?P<username>.+)").unwrap();
-    static ref ON_JOINED_ROOM_PATTERN: Regex = Regex::new(r"\[Behaviour\] OnJoinedRoom").unwrap();
+        Regex::new(r"\[Behaviour\] User Authenticated: (?P<username>\S+)").unwrap();
+    static ref ON_JOINED_ROOM_PATTERN: Regex =
+        Regex::new(r"\[Behaviour\] Finished entering world").unwrap();
     static ref ON_PLAYER_JOINED_PATTERN: Regex =
         Regex::new(r"\[Behaviour\] OnPlayerJoined (?P<username>.+)").unwrap();
     static ref ON_LEFT_ROOM_PATTERN: Regex = Regex::new(r"\[Behaviour\] OnLeftRoom").unwrap();
