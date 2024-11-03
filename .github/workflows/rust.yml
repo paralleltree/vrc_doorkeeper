@@ -1,6 +1,14 @@
 name: Rust
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 env:
   CARGO_TERM_COLOR: always
@@ -43,7 +51,7 @@ jobs:
           cp README.md artifacts\vrc_doorkeeper\README.txt
           Compress-Archive -Path artifacts\vrc_doorkeeper -DestinationPath artifacts\vrc_doorkeeper-${{ matrix.platform }}.zip
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.platform }}
           path: artifacts\vrc_doorkeeper-${{ matrix.platform }}.zip
@@ -64,7 +72,7 @@ jobs:
           draft: true
       - run: |
           echo '${{ steps.create-release.outputs.upload_url }}' > assets_upload_url
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: create-release
           path: assets_upload_url
@@ -79,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v4
         with:
           name: create-release
 
@@ -87,7 +95,7 @@ jobs:
         run: |
           echo "::set-output name=url::$(cat create-release/assets_upload_url)"
 
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v4
         with:
           name: build-${{ matrix.platform }}
 
