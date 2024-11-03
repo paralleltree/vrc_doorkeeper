@@ -21,10 +21,11 @@ lazy_static! {
     static ref ON_JOINED_ROOM_PATTERN: Regex =
         Regex::new(r"\[Behaviour\] Finished entering world").unwrap();
     static ref ON_PLAYER_JOINED_PATTERN: Regex =
-        Regex::new(r"\[Behaviour\] OnPlayerJoined (?P<username>.+)").unwrap();
+        Regex::new(r"\[Behaviour\] OnPlayerJoined (?P<username>.+?)($| \(usr_[a-z0-9-]+\))")
+            .unwrap();
     static ref ON_LEFT_ROOM_PATTERN: Regex = Regex::new(r"\[Behaviour\] OnLeftRoom").unwrap();
     static ref ON_PLAYER_LEFT_PATTERN: Regex =
-        Regex::new(r"\[Behaviour\] OnPlayerLeft (?P<username>.+)").unwrap();
+        Regex::new(r"\[Behaviour\] OnPlayerLeft (?P<username>.+?)($| \(usr_[a-z0-9-]+\))").unwrap();
 }
 
 #[cfg(target_os = "windows")]
@@ -149,7 +150,7 @@ mod tests {
     }
 
     #[test]
-    fn log_line_can_parse_on_player_joined_event() {
+    fn log_line_can_parse_old_on_player_joined_event() {
         let line = "2021.12.01 23:23:13 Log        -  [Behaviour] OnPlayerJoined paralleltree";
         let actual = LogLine::from_line(line).expect("could not parse log line.");
         let expected = LogLine {
@@ -159,6 +160,22 @@ mod tests {
                 user_name: "paralleltree".to_owned(),
             }),
             body: "[Behaviour] OnPlayerJoined paralleltree".to_owned(),
+        };
+        assert_eq!(expected, actual);
+    }
+    #[test]
+    fn log_line_can_parse_on_player_joined_event() {
+        let line = "2021.12.01 23:23:13 Log        -  [Behaviour] OnPlayerJoined paralleltree (usr_a58186d2-54f9-44c8-902b-6e03927f66c1)";
+        let actual = LogLine::from_line(line).expect("could not parse log line.");
+        let expected = LogLine {
+            time: local_time(&NaiveDate::from_ymd(2021, 12, 1).and_hms(23, 23, 13)),
+            log_level: LogLevel::Log,
+            event: Some(crate::vrc::Event::OnPlayerJoined {
+                user_name: "paralleltree".to_owned(),
+            }),
+            body:
+                "[Behaviour] OnPlayerJoined paralleltree (usr_a58186d2-54f9-44c8-902b-6e03927f66c1)"
+                    .to_owned(),
         };
         assert_eq!(expected, actual);
     }
@@ -177,7 +194,7 @@ mod tests {
     }
 
     #[test]
-    fn log_line_can_parse_on_player_left_event() {
+    fn log_line_can_parse_old_on_player_left_event() {
         let line = "2021.12.01 23:26:39 Log        -  [Behaviour] OnPlayerLeft paralleltree";
         let actual = LogLine::from_line(line).expect("could not parse log line.");
         let expected = LogLine {
@@ -187,6 +204,22 @@ mod tests {
                 user_name: "paralleltree".to_owned(),
             }),
             body: "[Behaviour] OnPlayerLeft paralleltree".to_owned(),
+        };
+        assert_eq!(expected, actual);
+    }
+    #[test]
+    fn log_line_can_parse_on_player_left_event() {
+        let line = "2021.12.01 23:26:39 Log        -  [Behaviour] OnPlayerLeft paralleltree (usr_a58186d2-54f9-44c8-902b-6e03927f66c1)";
+        let actual = LogLine::from_line(line).expect("could not parse log line.");
+        let expected = LogLine {
+            time: local_time(&NaiveDate::from_ymd(2021, 12, 1).and_hms(23, 26, 39)),
+            log_level: LogLevel::Log,
+            event: Some(crate::vrc::Event::OnPlayerLeft {
+                user_name: "paralleltree".to_owned(),
+            }),
+            body:
+                "[Behaviour] OnPlayerLeft paralleltree (usr_a58186d2-54f9-44c8-902b-6e03927f66c1)"
+                    .to_owned(),
         };
         assert_eq!(expected, actual);
     }
