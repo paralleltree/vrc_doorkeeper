@@ -61,6 +61,7 @@ where
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum LogLevel {
+    Debug,
     Log,
     Warning,
     Error,
@@ -81,6 +82,7 @@ impl LogLine {
         let timestamp = NaiveDateTime::parse_from_str(timestamp, "%Y.%m.%d %H:%M:%S").ok()?;
         let local_timestamp = Local.from_local_datetime(&timestamp).earliest()?;
         let level = match cap.name("level").unwrap().as_str() {
+            "Debug" => LogLevel::Debug,
             "Log" => LogLevel::Log,
             "Warning" => LogLevel::Warning,
             "Error" => LogLevel::Error,
@@ -165,11 +167,11 @@ mod tests {
     }
     #[test]
     fn log_line_can_parse_on_player_joined_event() {
-        let line = "2021.12.01 23:23:13 Log        -  [Behaviour] OnPlayerJoined paralleltree (usr_a58186d2-54f9-44c8-902b-6e03927f66c1)";
+        let line = "2021.12.01 23:23:13 Debug      -  [Behaviour] OnPlayerJoined paralleltree (usr_a58186d2-54f9-44c8-902b-6e03927f66c1)";
         let actual = LogLine::from_line(line).expect("could not parse log line.");
         let expected = LogLine {
             time: local_time(&NaiveDate::from_ymd(2021, 12, 1).and_hms(23, 23, 13)),
-            log_level: LogLevel::Log,
+            log_level: LogLevel::Debug,
             event: Some(crate::vrc::Event::OnPlayerJoined {
                 user_name: "paralleltree".to_owned(),
             }),
@@ -209,11 +211,11 @@ mod tests {
     }
     #[test]
     fn log_line_can_parse_on_player_left_event() {
-        let line = "2021.12.01 23:26:39 Log        -  [Behaviour] OnPlayerLeft paralleltree (usr_a58186d2-54f9-44c8-902b-6e03927f66c1)";
+        let line = "2021.12.01 23:26:39 Debug      -  [Behaviour] OnPlayerLeft paralleltree (usr_a58186d2-54f9-44c8-902b-6e03927f66c1)";
         let actual = LogLine::from_line(line).expect("could not parse log line.");
         let expected = LogLine {
             time: local_time(&NaiveDate::from_ymd(2021, 12, 1).and_hms(23, 26, 39)),
-            log_level: LogLevel::Log,
+            log_level: LogLevel::Debug,
             event: Some(crate::vrc::Event::OnPlayerLeft {
                 user_name: "paralleltree".to_owned(),
             }),
